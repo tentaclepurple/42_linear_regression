@@ -32,15 +32,6 @@ def load_data(filename):
     return X, y
 
 
-def normalize_data(X):
-    """
-    Normalize the data using the mean and standard deviation.
-    The features are on different scales, 
-    so we need to normalize them.
-    """
-    return (X - np.mean(X)) / np.std(X)
-
-
 def predict(X, m, b):
     """
     Predict the output using the linear model.
@@ -102,7 +93,7 @@ def ft_linear_regression():
     X_train, X_test, y_train, y_test = split_train_test(df, 0.2)
     
     # Normalize X_train y X_test
-    X_train_normalized = normalize_data(X_train)
+    X_train_normalized = (X_train - np.mean(X_train)) / np.std(X_train)
     X_test_normalized = (X_test - np.mean(X_train)) / np.std(X_train)
 
     # Hyperparameters
