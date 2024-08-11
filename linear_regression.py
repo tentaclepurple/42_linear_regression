@@ -2,7 +2,8 @@ import csv
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from mse import ft_mse, ft_r2_score
+import pickle
+from mse import ft_mse, ft_r2_score, calculate_accuracy
 
 
 def split_train_test(data, test_ratio):
@@ -85,7 +86,13 @@ def ft_linear_regression():
     """
     Perform linear regression on the data.
     """
-    df = pd.read_csv('data.csv')
+    try:
+        df = pd.read_csv('data.csv')
+        print("Training the model...")
+    except Exception as e:
+        print("An error occured: ", e)
+        return		
+
     X = df['km'].values
     y = df['price'].values
 
@@ -98,7 +105,7 @@ def ft_linear_regression():
 
     # Hyperparameters
     learning_rate = 0.01
-    iterations = 190
+    iterations = 10000
 
     # Train the model
     m_norm, b_norm = gradient_descent(X_train_normalized, y_train, learning_rate, iterations)
@@ -114,17 +121,30 @@ def ft_linear_regression():
     # calculate the mean squared error
     
     plot_data(X, y, m, b)
-
-    km_to_predict = 100000
-    predicted_price = predict(km_to_predict, m, b)
+    print("Plot saved as linear_regression.png")
     
+    print(f"Slope/theta1 (m): {m}")
+    print(f"Intercept/theta0  (b): {b:.2f}")
+
+    accuracy = calculate_accuracy(X_test, y_test, m, b)
     mse = ft_mse(y_test, y_pred)
     r2 = ft_r2_score(y_test, y_pred)
     
-    print(f"Slope (m): {m}")
-    print(f"Intercept (b): {b}")
-    print(f"Mean squared error: {mse:.2f}, R2 score: {r2:.2f}")
-    print(f"Predicted price for {km_to_predict} km is {predicted_price:.2f}")
+    #theta1 = m = slope
+    #theta0 = b = intercept
+
+    print(f"Mean squared error: {mse:.2f}")
+    print(f"R2 score: {r2:.4f}")
+    print(f"Accuracy: {accuracy:.2f}%")
+
+
+    params = (m, b)
+    try:
+        with open('params.pkl', 'wb') as f:
+            pickle.dump(params, f)
+    except Exception as e:
+        print("An error occured: ", e)
+        return
 
     return m, b
 
